@@ -5,8 +5,8 @@ Me pidieron mostrar una onda senoidal en el display, no me salio asi que hice un
 ## Features:
 - Botones funcionales.
 - Moves un puntito en la pantalla a gusto uwu.
+- AutoScroll.
 
 ## Todo:
-- AutoScroll.
 - Point System.
 - Alargar cola.
