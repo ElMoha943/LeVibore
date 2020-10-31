@@ -18,16 +18,13 @@
 #include"display.h"
 
 void main(){
-    unsigned char x, y;
-    unsigned char recibido;
-    unsigned char comando;
-    unsigned char command_data[10];
-    unsigned char command_data_index=0;
+    unsigned char x, y, recibido, comando, command_data[10], command_data_index=0, dir=2, contador;
+    int points = 0;
     
     TRISAbits.TRISA0=1;
     ANSEL=0;
     ANSELH=0;
-    
+    OPTION_REG=0x04;
     //Configura UART a 9600 baudios
     TXSTAbits.TXEN=1;
     TXSTAbits.BRGH=1;
@@ -96,6 +93,39 @@ void main(){
     x=40; y=50;
     Pixel(x,y,1);
     while(1){
+        //Timer Setup.
+        if(T0IF==1)
+        {
+            TMR0=TMR0+131;
+            T0IF=0;
+            contador++;
+            if (contador==25){
+                contador=0;
+                Pixel(x,y,0);
+                switch(dir){
+                    case 1:
+                        y--;
+                        break;
+                    case 2:
+                        x++;
+                        break;
+                    case 3:
+                        y++;
+                        break;
+                    case 4:
+                        x--;
+                        break;
+                    default:
+                        break;
+                }
+                if(x<5)x=82;
+                if(x>82)x=5;
+                if(y<17)y=114;
+                if(y>114)y=17;
+                Pixel(x,y,1);
+            }
+        }
+        //RECIBIR COMANDOS POR COM
         if(RCIF==1){
             recibido=RCREG;
             if(recibido>127){
@@ -110,26 +140,21 @@ void main(){
                 //Recibe comando de toque por parte del display
                 if(command_data[0]>=96 && command_data[0]<=104 && command_data[1]>=93 && command_data[1]<=103){
                     //FLECHA ARRIBA
-                    Pixel(x,y,0);
-                    y--;
+                    dir=1;
                 }
                 if(command_data[0]>=106 && command_data[0]<=114 && command_data[1]>=105 && command_data[1]<=115){
                    //FLECHA DERECHA
-                    Pixel(x,y,0);
-                    x++;
+                    dir=2;
                 }
                 if(command_data[0]>=96 && command_data[0]<=104 && command_data[1]>=105 && command_data[1]<=115){
                     //FLECHA ABAJO
-                    Pixel(x,y,0);
-                    y++;
+                    dir=3;
                 }
                 if(command_data[0]>=86 && command_data[0]<=94 && command_data[1]>=105 && command_data[1]<=115){
                    //FLECHA IZQUIERDA
-                    Pixel(x,y,0);
-                    x--;
+                    dir=4;
                 }
             }
-            Pixel(x,y,1);
         }
     }
 }
