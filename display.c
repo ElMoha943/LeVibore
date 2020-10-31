@@ -1,6 +1,13 @@
 #include<xc.h>
 #include"display.h"
 
+//static unsigned long next = 1;
+//
+//int myrand(unsigned char rand_max) {
+//    next = next * 1103515245 + 12345;
+//    return((unsigned)(next/65536) % rand_max);
+//}
+
 void Pixel(unsigned char x, unsigned char y, unsigned char on)
 {
     unsigned char datos[3];

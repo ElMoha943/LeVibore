@@ -14,11 +14,13 @@
 #pragma config BOR4V = BOR40V   // Brown-out Reset Selection bit (Brown-out Reset set to 4.0V)
 #pragma config WRT = OFF        // Flash Program Memory Self Write Enable bits (Write protection off)
 
-#include<xc.h>
-#include"display.h"
+#include <xc.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "display.h"
 
 void main(){
-    unsigned char x, y, recibido, comando, command_data[10], command_data_index=0, dir=2, contador;
+    unsigned char x, y, recibido, comando, command_data[10], command_data_index=0, dir=2, contador, pointx, pointy, c=0, d=0, u=0;
     int points = 0;
     
     TRISAbits.TRISA0=1;
@@ -92,6 +94,11 @@ void main(){
     //Cursor
     x=40; y=50;
     Pixel(x,y,1);
+    
+    //Punto inicial
+    pointx=rand() % 78 + 5;
+    pointy=rand() % 98 + 17;
+    Pixel(pointx,pointy,1);
     while(1){
         //Timer Setup.
         if(T0IF==1)
@@ -155,6 +162,19 @@ void main(){
                     dir=4;
                 }
             }
+        }
+        if(x==pointx && y==pointy){
+            Pixel(pointx,pointy,0); 
+            pointx=rand() % 78 + 5;
+            pointy=rand() % 98 + 17;
+            Pixel(pointx,pointy,1);
+            points++;
+            c=points/100;
+            d=points/10;
+            u=points%10;
+            PutChar(86,16,(c+48));
+            PutChar(92,16,(d+48));
+            PutChar(98,16,(u+48));
         }
     }
 }
