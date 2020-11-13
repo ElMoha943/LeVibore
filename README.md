@@ -10,3 +10,6 @@ Me pidieron mostrar una onda senoidal en el display, no me salio asi que hice un
 
 ## Todo:
 - Alargar cola.
+- Sistema de ganar/perder.
+- Menu Principal.
+- Boton de replay.
