@@ -1,6 +1,6 @@
 # LeVibore
 
-Me pidieron mostrar una onda senoidal en el display, no me salio asi que hice un jueguito de vivorita :D
+Clasico juego de la viborita portado a pic O:
 
 ## Features:
 - Botones funcionales.
