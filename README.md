@@ -6,10 +6,11 @@ Me pidieron mostrar una onda senoidal en el display, no me salio asi que hice un
 - Botones funcionales.
 - Moves un puntito en la pantalla a gusto uwu.
 - AutoScroll.
-- Point System.
+- Sistema de puntuacion.
+- Boton de replay.
+
 
 ## Todo:
 - Alargar cola.
-- Sistema de ganar/perder.
+- Poder perder.
 - Menu Principal.
-- Boton de replay.
