@@ -20,9 +20,7 @@
 #include "display.h"
 
 void main(){
-    unsigned char x, y, recibido, comando, command_data[10], command_data_index=0, dir=2, contador, pointx, pointy, c=0, d=0, u=0;
-    int points = 0;
-    
+    unsigned int flag=0, cont=0, cont2=0;
     TRISAbits.TRISA0=1;
     ANSEL=0;
     ANSELH=0;
@@ -40,141 +38,129 @@ void main(){
     Clear();
     
     //Dibujar pantalla
-    Rectangulo(4,16,80,100); //enrealidad dibuja 83-115, no se porque
+    MyRectangle(4,83,16,115);
+//    Rectangulo(4,16,80,100); //DIBUJA 83-115 (ES ANCHO Y LARGO, NO COORDENADAS)
     PutChar(86,16,'0');
     PutChar(92,16,'0');
     PutChar(98,16,'0');
     
     //Dibujar controles
     //up
-    for(x=96; x<104; x++){
-        Pixel(x,93,1);
-        Pixel(x,103,1);
-    }
-    for(x=93; x<103; x++){
-        Pixel(96,x,1);
-        Pixel(104,x,1);
-    }
+    MyRectangle(96,104,93,103);
     PutChar(98,95,'U');
     //right
-    for(x=106; x<114; x++){
-        Pixel(x,105,1);
-        Pixel(x,115,1);
-    }
-    for(x=105; x<115; x++){
-        Pixel(106,x,1);
-        Pixel(114,x,1);
-    }
+    MyRectangle(106,114,105,115);
     PutChar(108,107,'R');
     //down
-    for(x=96; x<104; x++){
-        Pixel(x,105,1);
-        Pixel(x,115,1);
-    }
-    for(x=105; x<115; x++){
-        Pixel(96,x,1);
-        Pixel(104,x,1);
-    }
+    MyRectangle(96,104,105,115);
     PutChar(98,107,'D');
     //left
-    for(x=86; x<94; x++){
-        Pixel(x,105,1);
-        Pixel(x,115,1);
-    }
-    for(x=105; x<115; x++){
-        Pixel(86,x,1);
-        Pixel(94,x,1);
-    }
+    MyRectangle(86,94,105,115);
     PutChar(88,107,'L');
     
-    // 86 - 105
-    //Rectangulo(90,16,110,26);
-    //Rectangulo(100,16,110,20); NO ANDA, DIBUJA EN 85;16 - NULL;25
+    //Iniciar (cursor y primer punto)
+    Iniciar();
     
-    //Cursor
-    x=40; y=50;
-    Pixel(x,y,1);
-    
-    //Punto inicial
-    pointx=rand() % 78 + 5;
-    pointy=rand() % 98 + 17;
-    Pixel(pointx,pointy,1);
     while(1){
-        //Timer Setup.
-        if(T0IF==1)
-        {
-            TMR0=TMR0+131;
-            T0IF=0;
-            contador++;
-            if (contador==25){
-                contador=0;
-                Pixel(x,y,0);
-                switch(dir){
-                    case 1:
-                        y--;
-                        break;
-                    case 2:
-                        x++;
-                        break;
-                    case 3:
-                        y++;
-                        break;
-                    case 4:
-                        x--;
-                        break;
-                    default:
-                        break;
+//        do{
+            //Timer Setup.
+            if(T0IF==1)
+            {
+                TMR0=TMR0+131;
+                T0IF=0;
+                contador++;
+                //contador de 1 segundo
+                if (contador==25){
+                    contador=0;
+                    //BORRA ANTIGUA VIBORA
+                    for(i=0;i<=cont2;i++){
+                        Pixel(x[i],y[i],0);
+                    }
+                    //DESPLAZAMIENTO
+                    switch(dir){
+                        case 1:
+                            for(i=1;i<=cont2;i++){
+                                y[i]=y[i-1];
+                                x[i]=x[i-1];
+                            }
+                            y[0]--;
+                            break;
+                        case 2:
+                            for(i=1;i<=cont2;i++){
+                                y[i]=y[i-1];
+                                x[i]=x[i-1];
+                            }
+                            x[0]++;
+                            break;
+                        case 3:
+                            for(i=1;i<=cont2;i++){
+                                y[i]=y[i-1];
+                                x[i]=x[i-1];
+                            }
+                            y[0]++;
+                            break;
+                        case 4:
+                            for(i=1;i<=cont2;i++){
+                                y[i]=y[i-1];
+                                x[i]=x[i-1];
+                            }
+                            x[0]--;
+                            break;
+                        default:
+                            break;
+                    }
+                    //ENTRA POR POR AQUI Y SALE POR AHI
+                    for(i=0;i<=cont2;i++){
+                        if(x[i]!=0 && y[i]!=0){
+                            if(x[i]<5)x[i]=82;
+                            if(x[i]>82)x[i]=5;
+                            if(y[i]<17)y[i]=114;
+                            if(y[i]>114)y[i]=17;
+                            //GRAFICA
+                            Pixel(x[i],y[i],1);
+                        }
+                    }
+                    if(flag==1){
+                        cont++;
+                        if(cont==cont2++){
+                            cont2=points;;
+                            cont=0;
+                            flag=0;
+                        }
+                    }
                 }
-                if(x<5)x=82;
-                if(x>82)x=5;
-                if(y<17)y=114;
-                if(y>114)y=17;
-                Pixel(x,y,1);
             }
-        }
-        //RECIBIR COMANDOS POR COM
-        if(RCIF==1){
-            recibido=RCREG;
-            if(recibido>127){
-                comando=recibido;
-                command_data_index=0;
-            }else{
-                command_data[command_data_index]=recibido;
-                if(command_data_index<9) command_data_index++;
+            //RECIBIR COMANDOS POR COM
+            recibir_comando();
+            //SISTEMA DE PUNTOS
+            if(x[0]==pointx && y[0]==pointy){
+                Pixel(pointx,pointy,0); 
+                flag=1;
+                points++;
+//                if(points==10){
+//                    win=1;
+//                    //BORRAR VIBORA
+//                    for(i=0;i<=points;i++){
+//                        Pixel(x[i],y[i],0);
+//                    }
+//                    //DIBUJAR BOTON DE REPLAY
+//                    MyRectangle(40,68,50,61);
+//                }
+//                else
+//                {
+                    GenerarPunto();
+//                }
+                MostrarPuntos();
             }
-            
-            if(comando==200 && command_data_index==2){
-                //Recibe comando de toque por parte del display
-                if(command_data[0]>=96 && command_data[0]<=104 && command_data[1]>=93 && command_data[1]<=103){
-                    //FLECHA ARRIBA
-                    dir=1;
-                }
-                if(command_data[0]>=106 && command_data[0]<=114 && command_data[1]>=105 && command_data[1]<=115){
-                   //FLECHA DERECHA
-                    dir=2;
-                }
-                if(command_data[0]>=96 && command_data[0]<=104 && command_data[1]>=105 && command_data[1]<=115){
-                    //FLECHA ABAJO
-                    dir=3;
-                }
-                if(command_data[0]>=86 && command_data[0]<=94 && command_data[1]>=105 && command_data[1]<=115){
-                   //FLECHA IZQUIERDA
-                    dir=4;
-                }
-            }
-        }
-        if(x==pointx && y==pointy){
-            Pixel(pointx,pointy,0); 
-            pointx=rand() % 78 + 5;
-            pointy=rand() % 98 + 17;
-            Pixel(pointx,pointy,1);
-            points++;
-            c=points/100;
-            d=points/10;
-            u=points%10;
-            PutChar(86,16,(c+48));
-            PutChar(92,16,(d+48));
-            PutChar(98,16,(u+48));
-        }
+//            if(win==1){
+//                while(win==1){
+//                    //ESPERAR A QUE SE PRESIONE EL BOTON REPLAY
+//                    recibir_comando();
+//                }
+//                NoRectangle(40,68,50,61);
+//                Iniciar();
+//            }
+            //REINICIAR JUEGO
+//        }while(rs==1); //REINICIAR PARTIDA?     
     }
 }
