@@ -34,133 +34,122 @@ void main(){
     SPBRG=25;
     SPBRGH=0;
     
-    //Borra display
-    Clear();
-    
-    //Dibujar pantalla
-    MyRectangle(4,83,16,115);
-//    Rectangulo(4,16,80,100); //DIBUJA 83-115 (ES ANCHO Y LARGO, NO COORDENADAS)
-    PutChar(86,16,'0');
-    PutChar(92,16,'0');
-    PutChar(98,16,'0');
-    
-    //Dibujar controles
-    //up
-    MyRectangle(96,104,93,103);
-    PutChar(98,95,'U');
-    //right
-    MyRectangle(106,114,105,115);
-    PutChar(108,107,'R');
-    //down
-    MyRectangle(96,104,105,115);
-    PutChar(98,107,'D');
-    //left
-    MyRectangle(86,94,105,115);
-    PutChar(88,107,'L');
-    
-    //Iniciar (cursor y primer punto)
+    //INICIALIZA EL JUEGO
     Iniciar();
     
     while(1){
-//        do{
-            //Timer Setup.
-            if(T0IF==1)
-            {
-                TMR0=TMR0+131;
-                T0IF=0;
-                contador++;
-                //contador de 1 segundo
-                if (contador==25){
-                    contador=0;
-                    //BORRA ANTIGUA VIBORA
-                    for(i=0;i<=cont2;i++){
-                        Pixel(x[i],y[i],0);
+        //Timer Setup.
+        if(T0IF==1)
+        {
+            TMR0=TMR0+131;
+            T0IF=0;
+            contador++;
+            //contador de 1 segundo
+            if (contador==25 && death!=1){
+                contador=0;
+                //BORRA ANTIGUA VIBORA
+                for(i=0;i<=cont2;i++){
+                    Pixel(x[i],y[i],0);
+                }
+                //DESPLAZAMIENTO
+                for(i=cont2;i>0;i--){
+                    y[i]=y[i-1];
+                    x[i]=x[i-1];
+                }
+                switch(dir){
+                    case 1:
+                        y[0]--;
+                        break;
+                    case 2:
+                        x[0]++;
+                        break;
+                    case 3:
+                        y[0]++;
+                        break;
+                    case 4:
+                        x[0]--;
+                        break;
+                    default:
+                        break;
+                }
+                //ENTRA POR POR AQUI Y SALE POR AHI
+                for(i=0;i<=cont2;i++){
+                    if(x[i]!=0 && y[i]!=0){
+                        if(x[i]<5)x[i]=82;
+                        if(x[i]>82)x[i]=5;
+                        if(y[i]<17)y[i]=114;
+                        if(y[i]>114)y[i]=17;
+                        //GRAFICA
+                        Pixel(x[i],y[i],1);
                     }
-                    //DESPLAZAMIENTO
-                    switch(dir){
-                        case 1:
-                            for(i=1;i<=cont2;i++){
-                                y[i]=y[i-1];
-                                x[i]=x[i-1];
-                            }
-                            y[0]--;
-                            break;
-                        case 2:
-                            for(i=1;i<=cont2;i++){
-                                y[i]=y[i-1];
-                                x[i]=x[i-1];
-                            }
-                            x[0]++;
-                            break;
-                        case 3:
-                            for(i=1;i<=cont2;i++){
-                                y[i]=y[i-1];
-                                x[i]=x[i-1];
-                            }
-                            y[0]++;
-                            break;
-                        case 4:
-                            for(i=1;i<=cont2;i++){
-                                y[i]=y[i-1];
-                                x[i]=x[i-1];
-                            }
-                            x[0]--;
-                            break;
-                        default:
-                            break;
-                    }
-                    //ENTRA POR POR AQUI Y SALE POR AHI
-                    for(i=0;i<=cont2;i++){
-                        if(x[i]!=0 && y[i]!=0){
-                            if(x[i]<5)x[i]=82;
-                            if(x[i]>82)x[i]=5;
-                            if(y[i]<17)y[i]=114;
-                            if(y[i]>114)y[i]=17;
-                            //GRAFICA
-                            Pixel(x[i],y[i],1);
-                        }
-                    }
-                    if(flag==1){
-                        cont++;
-                        if(cont==cont2++){
-                            cont2=points;;
-                            cont=0;
-                            flag=0;
-                        }
+                }
+                if(flag==1){
+                    cont++;
+                    if(cont==cont2+1){
+                        cont2=points;;
+                        cont=0;
+                        flag=0;
                     }
                 }
             }
-            //RECIBIR COMANDOS POR COM
-            recibir_comando();
-            //SISTEMA DE PUNTOS
-            if(x[0]==pointx && y[0]==pointy){
-                Pixel(pointx,pointy,0); 
-                flag=1;
-                points++;
-//                if(points==10){
-//                    win=1;
-//                    //BORRAR VIBORA
-//                    for(i=0;i<=points;i++){
-//                        Pixel(x[i],y[i],0);
-//                    }
-//                    //DIBUJAR BOTON DE REPLAY
-//                    MyRectangle(40,68,50,61);
-//                }
-//                else
-//                {
-                    GenerarPunto();
-//                }
-                MostrarPuntos();
+        }
+        //RECIBIR COMANDOS POR COM
+        if(RCSTAbits.OERR==1){
+            RCSTAbits.CREN=0;                
+            RCSTAbits.CREN=1;
+        }
+        recibir_comando();
+        //SISTEMA DE COLISIONES
+        for(i=1;i<=points;i++){
+            if(x[0]==x[i] && y[0]==y[i]){
+                death=1;
+                break;
             }
-//            if(win==1){
-//                while(win==1){
-//                    //ESPERAR A QUE SE PRESIONE EL BOTON REPLAY
-//                    recibir_comando();
-//                }
-//                NoRectangle(40,68,50,61);
-//                Iniciar();
-//            }
-            //REINICIAR JUEGO
-//        }while(rs==1); //REINICIAR PARTIDA?     
+        }
+        if(death==1){
+            PutChar(6,1,'P');
+            PutChar(12,1,'E');
+            PutChar(18,1,'R');
+            PutChar(24,1,'D');
+            PutChar(30,1,'I');
+            PutChar(36,1,'S');
+            PutChar(42,1,'T');
+            PutChar(48,1,'E');
+            ReplayDraw();
+            while(death==1){
+                //ESPERAR A QUE SE PRESIONE EL BOTON REPLAY
+                recibir_comando();
+            }
+            Iniciar();
+        }
+        //SISTEMA DE PUNTOS
+        if(x[0]==pointx && y[0]==pointy){
+            Pixel(pointx,pointy,0); 
+            flag=1;
+            points++;
+            if(points==10){
+                win=1;
+            }
+            else
+            {
+                GenerarPunto();
+            }
+            MostrarPuntos();
+        }
+        if(win==1){
+            PutChar(6,1,'G');
+            PutChar(12,1,'A');
+            PutChar(18,1,'N');
+            PutChar(24,1,'A');
+            PutChar(30,1,'S');
+            PutChar(36,1,'T');
+            PutChar(42,1,'E');
+            ReplayDraw();
+            while(win==1){
+                //ESPERAR A QUE SE PRESIONE EL BOTON REPLAY
+                recibir_comando();
+            }
+            Iniciar();
+        }   
     }
 }

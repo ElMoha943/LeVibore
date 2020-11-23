@@ -87,10 +87,9 @@ void recibir_comando(){
                //FLECHA IZQUIERDA
                 dir=4;
             }
-            if(command_data[0]>=40 && command_data[0]<=68 && command_data[1]>=50 && command_data[1]<=61 && win==1){
+            if(command_data[0]>=86 && command_data[0]<=124 && command_data[1]>=26 && command_data[1]<=46 && (win==1 || death==1)){
                //RESTART
-                win=0;
-                rs=1;
+                win=0; death=0;
             }
 
         }
@@ -104,6 +103,35 @@ void GenerarPunto(void){
 }
 
 void Iniciar(void){
+    //Borra display
+    Clear();
+    
+    //Dibujar pantalla
+    MyRectangle(4,83,16,115);
+    
+    //Reiniciar Puntos
+    points=0; win=0; death=0;
+    PutChar(86,16,'0');
+    PutChar(92,16,'0');
+    PutChar(98,16,'0');
+    
+    //Vaciar Vibora
+    for(i=0;i<=10;i++){
+        x[i]=0;
+        y[i]=0;
+    }
+    
+    //Dibujar controles  
+    MyRectangle(96,104,93,103);//up
+    PutChar(98,95,'U');  
+    MyRectangle(106,114,105,115);//right
+    PutChar(108,107,'R'); 
+    MyRectangle(96,104,105,115);//down
+    PutChar(98,107,'D');
+    MyRectangle(86,94,105,115);//left
+    PutChar(88,107,'L');
+    
+    //Cursor y Primer punto
     x[0]=40; y[0]=50;
     Pixel(x[0],y[0],1);
     GenerarPunto();
@@ -128,3 +156,13 @@ void MyRectangle(unsigned char x1, unsigned char x2, unsigned char y1, unsigned 
             Pixel(x2,i,1);
         }
     }
+
+void ReplayDraw(){
+    MyRectangle(86,124,26,36);
+    PutChar(88,28,'R');
+    PutChar(94,28,'E');
+    PutChar(100,28,'P');
+    PutChar(106,28,'L');
+    PutChar(112,28,'A');
+    PutChar(118,28,'Y');
+}
